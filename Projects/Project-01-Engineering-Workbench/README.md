@@ -73,3 +73,33 @@ The complete pytest test suite was also executed inside the Linux container:
 ```
 
 This confirms that the project and its automated tests can run successfully both in the local development environment and inside Docker.
+
+### Day 5
+
+#### Data Profiler Architecture
+
+Implemented a reusable data profiling pipeline using pandas.
+
+The application now:
+
+- Loads CSV datasets into pandas DataFrames.
+- Reports dataset shape (rows and columns).
+- Reports column names.
+- Detects missing values per column.
+- Detects duplicate rows.
+- Reports column data types.
+- Combines individual profiling operations into a complete profile report.
+- Separates data loading and data profiling responsibilities.
+
+The profiler architecture follows this flow:
+
+```text
+CSV Dataset
+    ↓
+Loader
+    ↓
+DataFrame
+    ↓
+Profiler
+    ↓
+Profile Report
