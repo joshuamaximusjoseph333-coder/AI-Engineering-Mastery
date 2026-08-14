@@ -103,3 +103,96 @@ DataFrame
 Profiler
     ↓
 Profile Report
+```
+### Day 6
+
+#### Data Validation
+
+Added a validation layer in `validator.py` to ensure that order datasets contain the required columns:
+
+- `order_id`
+- `product`
+- `price`
+
+The validator uses fail-fast validation. If required columns are missing, the application raises a clear `ValueError` before profiling continues.
+
+The application flow is now:
+
+CSV Dataset
+    ↓
+Loader
+    ↓
+DataFrame
+    ↓
+Validator
+    ↓
+Profiler
+    ↓
+Profile Report
+
+#### Operational Logging
+
+Improved the CSV loader with operational error logging.
+
+The loader records an INFO log before attempting to load a dataset:
+
+`INFO | Loading CSV file: ...`
+
+If the file does not exist, it records an ERROR log:
+
+`ERROR | CSV file not found: ...`
+
+The loader uses `try` / `except` to catch `FileNotFoundError`, log the failure, and then uses `raise` to re-raise the original exception.
+
+This ensures that the failure is recorded without hiding it or allowing the application to continue with invalid data.
+
+#### Automated Testing
+
+Added tests for the new validation layer:
+
+- Valid datasets containing all required columns
+- Invalid datasets with missing required columns
+- Expected exceptions using `pytest.raises()`
+
+The complete test suite now contains:
+
+- 4 loader tests
+- 6 profiler tests
+- 2 validator tests
+- 12 tests total
+
+All 12 tests pass locally and inside Docker.
+
+#### Debugging and Recovery
+
+Practiced diagnosing several types of failures:
+
+- Missing file → `FileNotFoundError`
+- Missing DataFrame column → `KeyError`
+- Invalid dataset schema → `ValueError`
+- Incorrect program output → pytest assertion failure
+- Regression caused by breaking previously working profiler logic
+
+Practiced the complete recovery workflow:
+
+Break
+    ↓
+Observe
+    ↓
+Diagnose
+    ↓
+Recover
+    ↓
+Verify application
+    ↓
+Verify pytest
+    ↓
+Verify Docker
+
+#### Output Readability
+
+Improved profile output using:
+
+`for key, value in profile.items():`
+
+This prints each profiler result on a separate line instead of displaying the entire profile dictionary on one line.
