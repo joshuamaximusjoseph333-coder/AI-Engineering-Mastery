@@ -23,4 +23,4 @@ def test_validate_required_columns_raises_for_missing_column():
     )
 
     with pytest.raises(ValueError, match="Missing required columns"):
-        validate_required_columns(data)    
+        validate_required_columns(data)

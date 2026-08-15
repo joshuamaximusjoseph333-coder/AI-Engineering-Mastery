@@ -77,6 +77,7 @@ def test_get_data_types():
     result = get_data_types(data)
 
     assert result["order_id"].startswith("int")
+    assert result["product"] in {"str", "object"}
     assert result["price"].startswith("int")
 
 def test_profile_data():

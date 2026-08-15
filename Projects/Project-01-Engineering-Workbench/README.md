@@ -1,3 +1,116 @@
+# Engineering Workbench
+
+A Python engineering project focused on building a reliable and maintainable data-processing application using modular design, automated testing, logging, validation, data profiling, and Docker.
+
+## Project Objective
+
+The goal of this project is to build an engineering workbench that can load CSV datasets, validate their structure, analyze their basic characteristics, and produce a readable data profile.
+
+The project is also used to practice software engineering principles such as:
+
+- Modular Python architecture
+- Separation of concerns
+- Configuration management
+- Operational logging
+- Error handling and fail-fast validation
+- Automated testing with pytest
+- Data analysis with pandas
+- Docker containerization
+- Debugging and recovery workflows
+- Git-based version control
+
+## Current Application Flow
+
+```text
+CSV Dataset
+    ↓
+Configuration
+    ↓
+Loader
+    ↓
+Pandas DataFrame
+    ↓
+Validator
+    ↓
+Profiler
+    ↓
+Profile Report
+```
+
+## Project Structure
+
+```text
+Project-01-Engineering-Workbench/
+│
+├── data/
+│   ├── raw/
+│   │   ├── customers.csv
+│   │   └── orders.csv
+│   └── processed/
+│
+├── src/
+│   └── data_loader/
+│       ├── __init__.py
+│       ├── config.py
+│       ├── loader.py
+│       ├── logger.py
+│       ├── profiler.py
+│       └── validator.py
+│
+├── tests/
+│   ├── test_loader.py
+│   ├── test_profiler.py
+│   └── test_validator.py
+│
+├── .dockerignore
+├── Dockerfile
+├── main.py
+├── README.md
+└── requirements.txt
+```
+
+## Running the Project
+
+Install the dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Run the application:
+
+```bash
+python main.py
+```
+
+Run the automated tests:
+
+```bash
+python -m pytest
+```
+
+## Running with Docker
+
+Build the Docker image:
+
+```bash
+docker build -t engineering-workbench .
+```
+
+Run the application:
+
+```bash
+docker run --rm engineering-workbench
+```
+
+Run the test suite inside Docker:
+
+```bash
+docker run --rm engineering-workbench python -m pytest
+```
+
+---
+
 ## Current Progress
 
 ### Day 2
@@ -156,12 +269,12 @@ Added tests for the new validation layer:
 
 The complete test suite now contains:
 
-- 4 loader tests
+- 6 loader tests
 - 6 profiler tests
 - 2 validator tests
 - 12 tests total
 
-All 12 tests pass locally and inside Docker.
+All 14 tests pass locally and inside Docker.
 
 #### Debugging and Recovery
 
