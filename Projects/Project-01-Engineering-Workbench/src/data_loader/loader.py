@@ -12,12 +12,18 @@ def count_lines(file_path: Path) -> int:
 
     return line_count
 
-def load_csv(file_path: Path) -> pd.DataFrame:
-    logging.info(f"Loading CSV file: {file_path}")
+def load_csv(
+    file_path: Path,
+    parse_dates: list[str] | None = None,
+) -> pd.DataFrame:
+    logging.info("Loading CSV file: %s", file_path)
 
     try:
-        return pd.read_csv(file_path)
+        return pd.read_csv(
+            file_path,
+            parse_dates=parse_dates,
+        )
 
     except FileNotFoundError:
-        logging.error(f"CSV file not found: {file_path}")
+        logging.error("CSV file not found: %s", file_path)
         raise

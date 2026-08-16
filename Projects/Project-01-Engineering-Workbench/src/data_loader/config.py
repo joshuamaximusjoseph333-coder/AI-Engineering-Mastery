@@ -1,3 +1,3 @@
 from pathlib import Path
 
-DATA_PATH = Path("data/raw/orders.csv")
+DATA_PATH = Path("data/raw/orders_week2.csv")

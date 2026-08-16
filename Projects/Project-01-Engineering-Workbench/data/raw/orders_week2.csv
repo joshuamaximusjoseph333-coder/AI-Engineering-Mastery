@@ -1,0 +1,11 @@
+order_id,customer_id,product,quantity,price,order_date,payment_method
+1001,1,Laptop,1,50000,2026-08-01,Card
+1002,2,Mouse,2,1000,2026-08-02,UPI
+1003,3,Keyboard,1,2000,2026-08-03,Cash
+1004,2,Monitor,1,15000,2026-08-04,Card
+1005,5,Webcam,2,3000,2026-08-05,UPI
+1006,1,Mouse,1,1000,2026-08-06,Card
+1007,4,Keyboard,2,2000,2026-08-07,Cash
+1008,3,Laptop,1,50000,2026-08-08,UPI
+1009,5,Monitor,1,15000,2026-08-09,Card
+1010,2,Webcam,3,3000,2026-08-10,UPI

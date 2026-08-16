@@ -3,12 +3,19 @@ import src.data_loader.logger
 from src.data_loader.config import DATA_PATH
 from src.data_loader.loader import load_csv
 from src.data_loader.profiler import profile_data
-from src.data_loader.validator import validate_required_columns
+from src.data_loader.validator import (
+    validate_order_values,
+    validate_required_columns,
+)
 
 
-data = load_csv(DATA_PATH)
+data = load_csv(
+    DATA_PATH,
+    parse_dates=["order_date"],
+)
 
 validate_required_columns(data)
+validate_order_values(data)
 
 profile = profile_data(data)
 
