@@ -450,3 +450,167 @@ Profile data
 ```
 
 This establishes the ingestion and validation foundation for the remaining Week 2 data investigation work.
+
+### Day 8
+
+#### Data-Quality Profiler
+
+Expanded the existing basic profiler into a richer data-quality profiling system.
+
+The profiler now reports:
+
+- Dataset shape
+- Column names
+- Data types
+- Missing-value counts
+- Missing-value percentages
+- Unique-value counts
+- Duplicate-row count
+- Numeric statistical summaries
+- Categorical value frequencies
+
+The profiler remains modular, with individual functions responsible for specific profiling operations and `profile_data()` combining them into a complete profile.
+
+#### Missing-Value Analysis
+
+Added missing-value percentages in addition to the existing missing-value counts.
+
+This makes it possible to understand not only how many values are missing, but also how significant the missing data is relative to the size of the dataset.
+
+The profiler uses:
+
+```python
+data.isna().mean().mul(100).round(2)
+```
+
+to calculate the percentage of missing values in each column.
+
+#### Unique-Value Analysis
+
+Added unique-value counts using:
+
+```python
+data.nunique()
+```
+
+This provides information about the cardinality of each column and helps distinguish characteristics such as unique identifiers and low-cardinality categorical fields.
+
+#### Numeric Profiling
+
+Added statistical summaries for meaningful numeric columns using pandas `describe()`.
+
+The numeric profile includes:
+
+- Count
+- Mean
+- Standard deviation
+- Minimum
+- 25th percentile
+- Median / 50th percentile
+- 75th percentile
+- Maximum
+
+Identifier columns such as `order_id` and `customer_id` are excluded from the numeric statistical summary because a numeric data type does not necessarily imply meaningful numeric analysis.
+
+The current numeric analysis therefore focuses on measurements such as:
+
+- `quantity`
+- `price`
+
+#### Categorical Profiling
+
+Added categorical value-frequency analysis for text-based columns.
+
+The profiler uses:
+
+```python
+value_counts()
+```
+
+to report how frequently each category occurs.
+
+For the Week 2 orders dataset, this provides frequency information for fields such as:
+
+- `product`
+- `payment_method`
+
+#### Validator and Profiler Responsibilities
+
+The project maintains a separation between validation and profiling:
+
+```text
+Validator
+→ enforces required data rules
+→ may reject invalid data
+
+Profiler
+→ measures and describes data characteristics
+→ produces information for investigation
+```
+
+The application pipeline remains:
+
+```text
+Raw CSV
+    ↓
+Configuration
+    ↓
+Configurable Ingestion
+    ↓
+Pandas DataFrame
+    ↓
+Schema Validation
+    ↓
+Value Validation
+    ↓
+Data-Quality Profiling
+    ↓
+Profile Report
+```
+
+#### Automated Testing
+
+Expanded the profiler test suite to cover the new Day 8 functionality.
+
+New tests verify:
+
+- Missing-value percentage calculations
+- Unique-value counts
+- Numeric statistical summaries
+- Exclusion of identifier columns from numeric analysis
+- Categorical value frequencies
+- Integration of the new metrics into `profile_data()`
+
+The complete test suite was successfully verified both locally and inside Docker.
+
+#### Day 8 Engineering Outcome
+
+The profiler evolved from a basic structural summary:
+
+```text
+Shape
+Columns
+Missing counts
+Duplicate rows
+Data types
+```
+
+into a more complete data-quality profile:
+
+```text
+Dataset Structure
+    ↓
+Completeness Analysis
+    ↓
+Uniqueness Analysis
+    ↓
+Data-Type Analysis
+    ↓
+Numeric Analysis
+    ↓
+Categorical Analysis
+    ↓
+Complete Data-Quality Profile
+```
+
+This provides the data investigation foundation needed for the upcoming SQL and statistical analysis stages of Project 01.

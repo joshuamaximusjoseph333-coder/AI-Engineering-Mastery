@@ -1,10 +1,10 @@
 import pandas as pd
 import pytest
-
 from src.data_loader.validator import (
     validate_order_values,
     validate_required_columns,
 )
+
 
 def test_validate_required_columns_passes():
     data = pd.DataFrame(
