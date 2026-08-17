@@ -4,7 +4,7 @@ A Python engineering project focused on building a reliable and maintainable dat
 
 ## Project Objective
 
-The goal of this project is to build an engineering workbench that can load CSV datasets, validate their structure, analyze their basic characteristics, and produce a readable data profile.
+The goal of this project is to build an engineering workbench that can reliably ingest CSV datasets, validate their structure and values, analyze their basic characteristics, and produce a readable data profile.
 
 The project is also used to practice software engineering principles such as:
 
@@ -21,21 +21,21 @@ The project is also used to practice software engineering principles such as:
 
 ## Current Application Flow
 
-```text
 CSV Dataset
     ↓
 Configuration
     ↓
-Loader
+Loader / Ingestion
     ↓
 Pandas DataFrame
     ↓
-Validator
+Schema Validation
+    ↓
+Value Validation
     ↓
 Profiler
     ↓
 Profile Report
-```
 
 ## Project Structure
 
@@ -44,7 +44,7 @@ Project-01-Engineering-Workbench/
 │
 ├── data/
 │   ├── raw/
-│   │   ├── customers.csv
+│   │   ├── orders_week2.csv
 │   │   └── orders.csv
 │   └── processed/
 │
@@ -272,7 +272,7 @@ The complete test suite now contains:
 - 6 loader tests
 - 6 profiler tests
 - 2 validator tests
-- 12 tests total
+- 14 tests total
 
 All 14 tests pass locally and inside Docker.
 
@@ -309,3 +309,144 @@ Improved profile output using:
 `for key, value in profile.items():`
 
 This prints each profiler result on a separate line instead of displaying the entire profile dictionary on one line.
+
+### Day 7
+
+#### Real CSV Ingestion
+
+Expanded the project from basic CSV loading into a more configurable ingestion workflow.
+
+The CSV loader now supports optional date parsing:
+
+```python
+def load_csv(
+    file_path: Path,
+    parse_dates: list[str] | None = None,
+) -> pd.DataFrame:
+```
+
+This allows source-specific ingestion requirements to be supplied by the caller instead of hard-coding them into the reusable loader.
+
+For the Week 2 orders dataset, `order_date` is parsed as a datetime during ingestion.
+
+#### Week 2 Orders Dataset
+
+Added `orders_week2.csv` with the following schema:
+
+- `order_id`
+- `customer_id`
+- `product`
+- `quantity`
+- `price`
+- `order_date`
+- `payment_method`
+
+This dataset provides a richer foundation for Week 2 data investigation, relational analysis, SQL, and statistics.
+
+#### Data Contract
+
+Expanded the orders data contract from the original three-column Week 1 schema to the complete Week 2 schema.
+
+The application now expects all seven order columns to be present.
+
+Basic value rules were also introduced:
+
+- `order_id` must not be missing and must be unique.
+- `customer_id` must not be missing.
+- `product` must not be missing.
+- `quantity` must be greater than zero.
+- `price` must be greater than zero.
+- `order_date` must not be missing.
+- `payment_method` must not be missing.
+
+#### Schema and Value Validation
+
+Validation is now separated into two responsibilities:
+
+```text
+validate_required_columns()
+→ verifies required structure
+
+validate_order_values()
+→ verifies basic value rules
+```
+
+The application performs schema validation before value validation so that value checks only access columns after their existence has been confirmed.
+
+The pipeline now follows:
+
+```text
+Raw CSV
+    ↓
+Ingestion
+    ↓
+Pandas DataFrame
+    ↓
+Schema Validation
+    ↓
+Value Validation
+    ↓
+Data Profiling
+    ↓
+Profile Report
+```
+
+#### Ingestion Investigation
+
+Explored important real-world CSV ingestion behavior, including:
+
+- Missing-value interpretation
+- Explicit data types
+- Date parsing
+- Alternative delimiters
+- File encodings
+- Malformed rows
+- Column selection
+- Sampling rows
+- Chunked ingestion
+- Metadata and skipped rows
+- Headerless files
+- Default NA handling
+- Comment lines
+
+These investigations were used to understand why successful file loading does not necessarily mean that the source data was interpreted correctly.
+
+#### Testing
+
+Updated the existing validator tests to reflect the new Week 2 data contract.
+
+Added tests for value-validation behavior, including:
+
+- Accepting valid order data
+- Rejecting invalid quantities
+- Rejecting duplicate order IDs
+
+The complete application and test suite were verified both locally and inside Docker.
+
+#### Day 7 Engineering Outcome
+
+By the end of Day 7, Project 01 had progressed from:
+
+```text
+Load CSV
+    ↓
+Profile data
+```
+
+to:
+
+```text
+Understand source requirements
+    ↓
+Configure ingestion
+    ↓
+Load CSV
+    ↓
+Validate schema
+    ↓
+Validate values
+    ↓
+Profile data
+```
+
+This establishes the ingestion and validation foundation for the remaining Week 2 data investigation work.
