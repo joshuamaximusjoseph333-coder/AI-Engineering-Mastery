@@ -614,3 +614,101 @@ Complete Data-Quality Profile
 ```
 
 This provides the data investigation foundation needed for the upcoming SQL and statistical analysis stages of Project 01.
+
+### Day 9
+
+#### SQL Foundations and SQLite Integration
+
+Added relational database functionality to the Engineering Workbench using Python's built-in SQLite support.
+
+The application now:
+
+- Connects to an SQLite database.
+- Creates an `orders` table with a defined schema.
+- Transfers pandas DataFrames into SQLite.
+- Executes SQL queries from Python.
+- Retrieves SQL query results back into Python.
+- Uses parameterized queries for dynamic values.
+- Performs filtering, sorting, grouping, and aggregation with SQL.
+
+#### SQL Concepts Implemented
+
+Practiced and implemented:
+
+- `SELECT` and `FROM`
+- `WHERE`
+- `AND`, `OR`, and `NOT`
+- `ORDER BY`
+- `LIMIT`
+- `DISTINCT`
+- `COUNT()`
+- `SUM()`
+- `AVG()`
+- `MIN()` and `MAX()`
+- `GROUP BY`
+- `HAVING`
+- SQL aliases with `AS`
+- `CREATE TABLE`
+- Primary keys and `NOT NULL` constraints
+- Parameterized SQL queries
+
+#### Database Layer
+
+Added:
+
+```text
+src/data_loader/database.py
+```
+
+The database layer contains reusable functions for:
+
+```text
+Database connection
+DataFrame → SQLite persistence
+Table creation
+Retrieving orders
+Filtering expensive orders
+Counting orders by payment method
+Aggregating quantities by product
+```
+
+The application architecture now includes:
+
+```text
+CSV Dataset
+    ↓
+Loader
+    ↓
+Pandas DataFrame
+    ↓
+Validator
+    ↓
+Profiler
+    ↓
+SQLite Database
+    ↓
+SQL Queries
+    ↓
+Analysis Results
+```
+
+#### Database Testing
+
+Added:
+
+```text
+tests/test_database.py
+```
+
+Database tests use pytest's `tmp_path` to create isolated temporary SQLite databases instead of modifying the real application database.
+
+The tests verify:
+
+- Database connection
+- SQL table creation
+- DataFrame-to-SQL persistence
+- SQL filtering and sorting
+- `GROUP BY` with `COUNT()`
+- `GROUP BY` with `SUM()`
+
+The application and complete automated test suite were successfully verified both locally and inside Docker.
