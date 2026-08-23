@@ -91,3 +91,101 @@ def get_product_quantity_totals(
     )
 
     return result.fetchall()
+
+def get_customer_order_details(
+    connection: sqlite3.Connection,
+) -> list[tuple]:
+    result = connection.execute(
+        """
+        SELECT
+            orders.order_id,
+            customers.customer_name,
+            customers.city,
+            orders.product,
+            orders.quantity,
+            orders.price
+        FROM orders
+        INNER JOIN customers
+            ON orders.customer_id = customers.customer_id
+        ORDER BY orders.order_id;
+        """
+    )
+
+    return result.fetchall()
+
+def get_all_customers_with_orders(
+    connection: sqlite3.Connection,
+) -> list[tuple]:
+    result = connection.execute(
+        """
+        SELECT
+            customers.customer_id,
+            customers.customer_name,
+            customers.city,
+            orders.order_id,
+            orders.product
+        FROM customers
+        LEFT JOIN orders
+            ON customers.customer_id = orders.customer_id
+        ORDER BY customers.customer_id;
+        """
+    )
+
+    return result.fetchall()
+
+def get_customers_without_orders(
+    connection: sqlite3.Connection,
+) -> list[tuple]:
+    result = connection.execute(
+        """
+        SELECT
+            customers.customer_id,
+            customers.customer_name,
+            customers.city
+        FROM customers
+        LEFT JOIN orders
+            ON customers.customer_id = orders.customer_id
+        WHERE orders.order_id IS NULL
+        ORDER BY customers.customer_id;
+        """
+    )
+
+    return result.fetchall()
+
+def get_orders_per_customer(
+    connection: sqlite3.Connection,
+) -> list[tuple]:
+    result = connection.execute(
+        """
+        SELECT
+            customers.customer_name,
+            COUNT(orders.order_id) AS order_count
+        FROM customers
+        LEFT JOIN orders
+            ON customers.customer_id = orders.customer_id
+        GROUP BY
+            customers.customer_id,
+            customers.customer_name
+        ORDER BY order_count DESC;
+        """
+    )
+
+    return result.fetchall()
+
+def get_revenue_by_city(
+    connection: sqlite3.Connection,
+) -> list[tuple]:
+    result = connection.execute(
+        """
+        SELECT
+            customers.city,
+            SUM(orders.quantity * orders.price) AS revenue
+        FROM customers
+        INNER JOIN orders
+            ON customers.customer_id = orders.customer_id
+        GROUP BY customers.city
+        ORDER BY revenue DESC;
+        """
+    )
+
+    return result.fetchall()
