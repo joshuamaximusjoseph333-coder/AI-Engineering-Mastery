@@ -1178,3 +1178,269 @@ Readable Analysis Results
 ```
 
 The complete Day 11 application and automated test suite were successfully verified both locally and inside Docker.
+
+### Day 12
+
+#### Data Investigation and Reporting
+
+Completed the Week 2 data investigation by combining the Engineering Workbench's existing ingestion, validation, profiling, statistical, and relational SQL capabilities into a structured analytical investigation.
+
+Added:
+
+```text
+reports/data_investigation_report.md
+```
+
+The report converts raw analytical results into evidence-based findings, interpretations, limitations, and recommendations.
+
+The investigation follows:
+
+```text
+Business / Investigation Question
+              ↓
+        Required Data
+              ↓
+       Analysis Method
+              ↓
+            Result
+              ↓
+           Finding
+              ↓
+        Interpretation
+              ↓
+     Evidence-Based Conclusion
+```
+
+#### Investigation Scope
+
+The report investigates:
+
+- Dataset structure and data quality.
+- Missing values and duplicate records.
+- Price distribution and variation.
+- Statistical outliers.
+- Product purchase quantities.
+- Payment method usage.
+- Customer ordering activity.
+- Customers without matching orders.
+- Revenue by city.
+
+The analysis reuses the existing Project 01 layers rather than duplicating their functionality.
+
+```text
+loader.py
+    ↓
+Data Ingestion
+
+validator.py
+    ↓
+Data Validation
+
+profiler.py
+    ↓
+Data Quality Investigation
+
+statistics.py
+    ↓
+Statistical Investigation
+
+database.py
+    ↓
+SQL and Relational Investigation
+
+        ↓
+
+Data Investigation Report
+```
+
+#### Data Quality Findings
+
+The current orders dataset contains:
+
+```text
+Rows:        10
+Columns:      7
+Duplicates:   0
+Missing:      0
+```
+
+The dataset passed the structural and value checks currently implemented by the Engineering Workbench.
+
+Successful validation is treated as evidence that the data satisfies the implemented rules, not as a guarantee that every value is correct in the real world.
+
+#### Statistical Findings
+
+Price analysis identified:
+
+```text
+Mean                 ₹14,200
+Median                ₹3,000
+Standard Deviation   ≈₹19,611.79
+Q1                    ₹2,000
+Q3                   ₹15,000
+Skewness               1.486
+Direction             Right-skewed
+```
+
+The mean is substantially higher than the median, while the positive skewness value indicates a right-skewed price distribution.
+
+IQR analysis identified two ₹50,000 observations above the calculated upper bound of ₹34,500.
+
+These observations correspond to plausible laptop prices and are therefore treated as statistical signals requiring context rather than automatically being removed as data errors.
+
+#### Product Findings
+
+Total purchased quantity by product:
+
+```text
+Webcam       5
+Mouse        3
+Keyboard     3
+Monitor      2
+Laptop       2
+```
+
+Webcam has the highest total purchased quantity in the current dataset.
+
+The result measures quantity only and is not interpreted as profitability or overall product performance.
+
+#### Payment Findings
+
+Order counts by payment method:
+
+```text
+UPI      4
+Card     4
+Cash     2
+```
+
+UPI and Card are tied as the most frequently occurring payment methods in the current dataset.
+
+Because only 10 orders are available, the result is not generalized into broader customer payment preferences.
+
+#### Customer Findings
+
+Order counts by customer:
+
+```text
+Priya     3
+Arjun     2
+Rahul     2
+Aisha     2
+Neha      1
+Kiran     0
+```
+
+Priya has the highest order count in the current dataset.
+
+Kiran exists in the customer dataset but has no matching orders.
+
+The relational analysis uses `LEFT JOIN` so customers without matching orders remain visible in the results.
+
+Order frequency is not treated as equivalent to customer value, profitability, loyalty, or lifetime value.
+
+#### Geographic Revenue Findings
+
+Revenue represented in the current dataset by city:
+
+```text
+Chennai       ₹52,000
+Kochi         ₹51,000
+Bengaluru     ₹26,000
+Hyderabad     ₹21,000
+Mumbai         ₹4,000
+```
+
+Chennai generated the highest revenue in the current dataset, followed closely by Kochi.
+
+These results describe only the available records and are not sufficient to conclude that Chennai is the company's strongest overall market or the best location for future investment.
+
+#### Evidence-Based Interpretation
+
+Day 12 introduced an important distinction between:
+
+```text
+Result
+   ↓
+Finding
+   ↓
+Interpretation
+   ↓
+Conclusion
+```
+
+For example:
+
+```text
+Result:
+Chennai revenue = ₹52,000
+
+Finding:
+Chennai generated the highest revenue
+in the current dataset.
+
+Unsupported overgeneralization:
+Chennai is the company's strongest market.
+```
+
+Conclusions are intentionally limited to what the available evidence supports.
+
+#### Investigation Limitations
+
+The report explicitly records several limitations:
+
+- Only 10 order records are available.
+- Only a small number of customers are represented.
+- Time coverage is limited.
+- Product coverage is limited.
+- Product cost information is unavailable.
+- Profit margins cannot currently be calculated.
+- Order frequency does not measure complete customer value.
+- Revenue does not measure profitability.
+- Statistical outliers are not automatically data errors.
+- Validation cannot guarantee real-world correctness.
+
+These limitations prevent the results from being generalized beyond the available evidence.
+
+#### Recommendations and Next Steps
+
+The investigation recommends:
+
+- Collecting a larger order dataset.
+- Analyzing longer historical periods.
+- Adding product cost information.
+- Expanding customer spending analysis.
+- Comparing product quantity with revenue and eventually profit.
+- Investigating geographic performance across more data.
+- Continuing to investigate statistical outliers using business context.
+- Extending the Engineering Workbench toward a reusable production service.
+
+#### Week 2 Final Architecture
+
+At the end of Day 12, the Engineering Workbench follows:
+
+```text
+Raw CSV Data
+      ↓
+CSV Ingestion
+      ↓
+Validation
+      ↓
+Data Profiling
+      ↓
+Statistical Analysis
+      ↓
+SQLite Persistence
+      ↓
+Relational SQL Analysis
+      ↓
+Evidence
+      ↓
+Interpretation
+      ↓
+Data Investigation Report
+```
+
+The report was manually verified against the actual application output, and the complete regression test suite was successfully executed.
+
+Day 12 completes the Week 2 Data Investigation, SQL, and Statistics stage of Project 01.
