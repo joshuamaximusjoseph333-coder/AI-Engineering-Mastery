@@ -866,4 +866,315 @@ Business Analysis Results
 
 The complete application and automated test suite were successfully verified both locally and inside Docker.
 
-> Note: The current `customer_id` primary-key/foreign-key relationship is a logical relational model used by the SQL queries. Because the current pandas persistence layer uses `to_sql(..., if_exists="replace")`, SQLite is not yet enforcing the relationship as an actual foreign-key constraint.
+> Note: The current `customer_id` primary-key/foreign-key relationship is a logical relational model used by the SQL queries. Because the current pandas persistence layer uses `to_sql(..., if_exists="replace")`, SQLite is not yet enforcing the relationship as an actual foreign-key constraint.       
+
+### Day 11
+
+#### Descriptive Statistics and Statistical Analysis
+
+Extended the Engineering Workbench with a dedicated statistical analysis layer for investigating numerical data beyond the basic summaries already provided by the data profiler.
+
+Added:
+
+```text
+src/data_loader/statistics.py
+```
+
+The application can now perform dedicated descriptive statistical analysis on numerical DataFrame columns.
+
+The Day 11 statistical workflow is:
+
+```text
+orders_week2.csv
+       ↓
+Pandas DataFrame
+       ↓
+Validation
+       ↓
+Data Profiling
+       ↓
+Descriptive Statistics
+       │
+       ├── Central Tendency
+       ├── Spread
+       ├── Quartiles
+       ├── Distribution / Skewness
+       └── Outlier Detection
+       ↓
+Statistical Interpretation
+```
+
+#### Descriptive Statistics
+
+Implemented reusable statistical analysis for numerical columns including:
+
+- Mean
+- Median
+- Mode
+- Minimum
+- Maximum
+- Range
+- Variance
+- Standard deviation
+- First quartile (Q1)
+- Third quartile (Q3)
+- Skewness
+
+The statistical functions accept a DataFrame and column name, allowing the same analysis logic to be reused for different numerical variables.
+
+Example:
+
+```python
+get_descriptive_statistics(
+    orders,
+    "price",
+)
+```
+
+This selects the `price` Series from the orders DataFrame and calculates its descriptive statistics.
+
+#### Distribution and Skewness
+
+Added skewness analysis to measure the asymmetry of a numerical distribution.
+
+Pandas calculates skewness using:
+
+```python
+series.skew()
+```
+
+The application also converts the numerical skewness result into a human-readable direction:
+
+```text
+Positive skewness → right-skewed
+Negative skewness → left-skewed
+Zero             → symmetric
+```
+
+For the current order-price dataset:
+
+```text
+Mean       = 14,200
+Median     = 3,000
+Skewness   ≈ 1.486
+Direction  = right-skewed
+```
+
+The mean is substantially larger than the median because higher-priced observations pull the arithmetic mean upward.
+
+The positive skewness value supports the interpretation that the price distribution is right-skewed.
+
+#### IQR Outlier Detection
+
+Implemented reusable outlier detection using the Interquartile Range (IQR) method.
+
+The analysis calculates:
+
+```text
+IQR = Q3 - Q1
+
+Lower Bound = Q1 - 1.5 × IQR
+Upper Bound = Q3 + 1.5 × IQR
+```
+
+Values outside these boundaries are identified using Pandas boolean filtering:
+
+```python
+outliers = series[
+    (series < lower_bound) | (series > upper_bound)
+]
+```
+
+For the current price dataset:
+
+```text
+Q1          = 2,000
+Q3          = 15,000
+IQR         = 13,000
+Lower Bound = -17,500
+Upper Bound = 34,500
+
+Potential Outliers:
+50,000
+50,000
+```
+
+The ₹50,000 observations are therefore statistical outliers according to the IQR rule.
+
+However, statistical outliers are not automatically treated as invalid data. These observations represent plausible expensive products such as laptops, so they should be investigated in context rather than automatically removed.
+
+The engineering workflow is:
+
+```text
+Detect
+   ↓
+Investigate
+   ↓
+Validate Against Context
+   ↓
+Keep / Correct / Remove
+```
+
+#### Statistical Interpretation
+
+Day 11 extends the project beyond simply calculating statistics.
+
+The application results can now be interpreted together:
+
+```text
+Mean                 = 14,200
+Median               = 3,000
+Standard Deviation   ≈ 19,611.79
+Skewness             ≈ 1.486
+Skew Direction       = right-skewed
+IQR Outliers         = [50,000, 50,000]
+```
+
+These results indicate that:
+
+- Order prices have substantial variation.
+- Higher-priced observations pull the mean well above the median.
+- The price distribution is positively/right skewed.
+- ₹50,000 observations are unusually high according to the IQR rule.
+- Statistical unusualness does not necessarily indicate incorrect data.
+
+This separates statistical calculation from statistical interpretation.
+
+#### Profiler vs Statistical Analysis
+
+The existing `profiler.py` continues to provide a broad overview of the dataset:
+
+```text
+Shape
+Columns
+Missing values
+Missing percentages
+Unique counts
+Duplicates
+Data types
+Basic numeric summary
+Categorical summary
+```
+
+The new `statistics.py` layer provides deeper analysis of individual numerical variables:
+
+```text
+Mean / Median / Mode
+Range
+Variance
+Standard Deviation
+Quartiles
+Skewness
+Skewness Direction
+IQR
+Outlier Bounds
+Potential Outliers
+```
+
+There is intentional overlap between the profiler and statistical analysis because basic descriptive statistics are useful during profiling, while the dedicated statistics layer supports deeper investigation and interpretation.
+
+#### Statistical Analysis Functions
+
+Added reusable functions in `statistics.py` for:
+
+```text
+get_descriptive_statistics()
+get_outliers()
+get_skewness_direction()
+```
+
+This keeps statistical logic separate from application orchestration in `main.py`.
+
+The responsibility is:
+
+```text
+statistics.py
+     ↓
+Perform statistical calculations
+
+main.py
+     ↓
+Coordinate the application and display results
+```
+
+#### Readable Console Reporting
+
+Improved the application output by separating results into readable sections:
+
+```text
+=== Data Profile ===
+
+=== Price Statistics ===
+
+=== Price Outlier Analysis ===
+
+=== SQL Analysis ===
+```
+
+Dictionary results are printed one key/value pair at a time, while SQL query results are printed one row at a time.
+
+This improves readability without changing the underlying analysis logic.
+
+#### Statistical Testing
+
+Added:
+
+```text
+tests/test_statistics.py
+```
+
+Automated tests verify:
+
+- Descriptive statistical calculations
+- Mean and median
+- Mode behavior
+- Minimum and maximum
+- Range
+- Quartiles
+- Positive skew direction
+- Negative skew direction
+- Symmetric skew direction
+- IQR-based outlier detection
+
+Tests use small controlled DataFrames with known expected results so the statistical functions can be verified independently.
+
+The complete regression test suite was also run to ensure the new statistical layer did not break existing:
+
+```text
+CSV loading
+Validation
+Profiling
+SQLite persistence
+SQL analysis
+Relational SQL functionality
+```
+
+#### Updated Application Architecture
+
+The Engineering Workbench now follows:
+
+```text
+Raw CSV Data
+      ↓
+Pandas DataFrames
+      ↓
+Validation
+      ↓
+Data Profiling
+      ↓
+Descriptive Statistical Analysis
+      │
+      ├── Center
+      ├── Spread
+      ├── Quartiles
+      ├── Skewness
+      └── Outliers
+      ↓
+SQLite Persistence
+      ↓
+Relational SQL Analysis
+      ↓
+Readable Analysis Results
+```
+
+The complete Day 11 application and automated test suite were successfully verified both locally and inside Docker.
