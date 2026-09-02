@@ -1,5 +1,5 @@
 import pytest
-from src.data_loader.loader import count_lines, load_csv
+from engineering_workbench.loader import count_lines, load_csv
 
 
 def test_count_lines(tmp_path):

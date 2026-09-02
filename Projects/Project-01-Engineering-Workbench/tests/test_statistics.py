@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.data_loader.statistics import (
+from engineering_workbench.statistics import (
     get_descriptive_statistics,
     get_outliers,
     get_skewness_direction,
@@ -42,6 +42,5 @@ def test_get_outliers():
     result = get_outliers(
         data,
         "price",
-    )
-
-    assert result["outliers"] == [100]    
+    ) 
+    assert result["outliers"] == [100]

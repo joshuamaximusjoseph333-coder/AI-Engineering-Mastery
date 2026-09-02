@@ -1444,3 +1444,66 @@ Data Investigation Report
 The report was manually verified against the actual application output, and the complete regression test suite was successfully executed.
 
 Day 12 completes the Week 2 Data Investigation, SQL, and Statistics stage of Project 01.
+
+## Week 3 — Production Service
+
+### Day 13 — Refactor Into a Professional Package
+
+Day 13 refactored the Engineering Workbench from a collection of data-processing modules into a structured, installable Python package suitable for reuse by future CLI and API interfaces.
+
+### Key Changes
+
+- Renamed the package from `data_loader` to `engineering_workbench` to better represent its expanded responsibilities.
+- Retained a professional `src` project layout.
+- Added `pyproject.toml` for Python package configuration and package discovery.
+- Installed the project in editable mode for development.
+- Replaced `src.engineering_workbench` imports with clean `engineering_workbench` imports.
+- Added `service.py` as an orchestration/service layer.
+- Refactored `main.py` into a thin application entry point.
+- Added a public package interface through `__init__.py`.
+- Added service-level tests for the new orchestration boundary.
+- Added guaranteed database connection cleanup using `try/finally`.
+- Updated Docker packaging so the `engineering_workbench` package is installed inside the container.
+
+### Current Architecture
+
+```text
+main.py
+   ↓
+engineering_workbench
+   ↓
+service.py
+   ↓
+├── loader.py
+├── validator.py
+├── profiler.py
+├── statistics.py
+└── database.py
+```
+
+The service layer now contains the high-level application workflows:
+
+```python
+run_analysis()
+run_database_analysis(orders)
+```
+
+This creates a reusable architecture for upcoming interfaces:
+
+```text
+              service.py
+             ↗    ↑    ↖
+          main    CLI    API
+```
+
+### Verification
+
+The refactored application was verified through:
+
+- Full local test suite
+- Local application execution
+- Docker image rebuild
+- Application execution inside Docker
+- Full test suite inside Docker
+
+The refactoring preserved existing application behavior while establishing a cleaner package and service architecture for Week 3.

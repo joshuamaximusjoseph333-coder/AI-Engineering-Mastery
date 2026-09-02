@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from src.data_loader.validator import (
+from engineering_workbench.validator import (
     validate_order_values,
     validate_required_columns,
 )

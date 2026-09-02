@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.data_loader.database import (
+from engineering_workbench.database import (
     create_connection,
     create_orders_table,
     get_all_orders,

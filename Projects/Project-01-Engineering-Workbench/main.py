@@ -1,159 +1,90 @@
-import src.data_loader.logger
+import engineering_workbench.logger
 
-from src.data_loader.config import (
-    CUSTOMERS_DATA_PATH,
-    DATABASE_PATH,
-    ORDERS_DATA_PATH,
-)
-from src.data_loader.database import (
-    create_connection,
-    get_all_customers_with_orders,
-    get_customer_order_details,
-    get_customers_without_orders,
-    get_expensive_orders,
-    get_orders_per_customer,
-    get_payment_method_counts,
-    get_product_quantity_totals,
-    get_revenue_by_city,
-    write_dataframe_to_table,
-)
-from src.data_loader.loader import load_csv
-from src.data_loader.profiler import profile_data
-from src.data_loader.statistics import (
-    get_descriptive_statistics,
-    get_outliers,
-)
-from src.data_loader.validator import (
-    validate_order_values,
-    validate_required_columns,
+from engineering_workbench import (
+    run_analysis,
+    run_database_analysis,
 )
 
 
-# Load data
-orders = load_csv(
-    ORDERS_DATA_PATH,
-    parse_dates=["order_date"],
-)
+def main():
+    # Run data analysis
+    analysis_results = run_analysis()
 
-customers = load_csv(CUSTOMERS_DATA_PATH)
+    profile = analysis_results["profile"]
+    price_statistics = analysis_results["price_statistics"]
+    price_outliers = analysis_results["price_outliers"]
 
+    # Run database analysis
+    database_results = run_database_analysis(
+        analysis_results["orders"]
+    )
 
-# Validate orders
-validate_required_columns(orders)
-validate_order_values(orders)
+    expensive_orders = database_results["expensive_orders"]
+    payment_counts = database_results["payment_counts"]
+    product_totals = database_results["product_totals"]
+    customer_order_details = database_results["customer_order_details"]
+    all_customers_with_orders = database_results[
+        "all_customers_with_orders"
+    ]
+    customers_without_orders = database_results[
+        "customers_without_orders"
+    ]
+    orders_per_customer = database_results["orders_per_customer"]
+    revenue_by_city = database_results["revenue_by_city"]
 
+    # Print data profile
+    print("\n=== Data Profile ===")
 
-# Profile orders
-profile = profile_data(orders)
+    for key, value in profile.items():
+        print(f"{key}: {value}")
 
+    # Print price statistics
+    print("\n=== Price Statistics ===")
 
-# Statistical analysis
-price_statistics = get_descriptive_statistics(
-    orders,
-    "price",
-)
+    for key, value in price_statistics.items():
+        print(f"{key}: {value}")
 
-price_outliers = get_outliers(
-    orders,
-    "price",
-)
+    # Print outlier analysis
+    print("\n=== Price Outlier Analysis ===")
 
+    for key, value in price_outliers.items():
+        print(f"{key}: {value}")
 
-# Print data profile
-print("\n=== Data Profile ===")
+    # Print SQL analysis
+    print("\n=== SQL Analysis ===")
 
-for key, value in profile.items():
-    print(f"{key}: {value}")
+    print("\nExpensive orders:")
+    for row in expensive_orders:
+        print(row)
 
+    print("\nPayment method counts:")
+    for row in payment_counts:
+        print(row)
 
-# Print price statistics
-print("\n=== Price Statistics ===")
+    print("\nProduct quantity totals:")
+    for row in product_totals:
+        print(row)
 
-for key, value in price_statistics.items():
-    print(f"{key}: {value}")
+    print("\nCustomer order details:")
+    for row in customer_order_details:
+        print(row)
 
+    print("\nAll customers with orders:")
+    for row in all_customers_with_orders:
+        print(row)
 
-# Print outlier analysis
-print("\n=== Price Outlier Analysis ===")
+    print("\nCustomers without orders:")
+    for row in customers_without_orders:
+        print(row)
 
-for key, value in price_outliers.items():
-    print(f"{key}: {value}")
+    print("\nOrders per customer:")
+    for row in orders_per_customer:
+        print(row)
 
-
-# Create database connection
-connection = create_connection(DATABASE_PATH)
-
-
-# Write data to SQLite
-write_dataframe_to_table(
-    connection,
-    orders,
-    "orders",
-)
-
-write_dataframe_to_table(
-    connection,
-    customers,
-    "customers",
-)
-
-
-# Run SQL analysis
-expensive_orders = get_expensive_orders(
-    connection,
-    minimum_price=3000,
-)
-
-payment_counts = get_payment_method_counts(connection)
-
-product_totals = get_product_quantity_totals(connection)
-
-customer_order_details = get_customer_order_details(connection)
-
-all_customers_with_orders = get_all_customers_with_orders(connection)
-
-customers_without_orders = get_customers_without_orders(connection)
-
-orders_per_customer = get_orders_per_customer(connection)
-
-revenue_by_city = get_revenue_by_city(connection)
+    print("\nRevenue by city:")
+    for row in revenue_by_city:
+        print(row)
 
 
-# Print SQL analysis
-print("\n=== SQL Analysis ===")
-
-print("\nExpensive orders:")
-for row in expensive_orders:
-    print(row)
-
-print("\nPayment method counts:")
-for row in payment_counts:
-    print(row)
-
-print("\nProduct quantity totals:")
-for row in product_totals:
-    print(row)
-
-print("\nCustomer order details:")
-for row in customer_order_details:
-    print(row)
-
-print("\nAll customers with orders:")
-for row in all_customers_with_orders:
-    print(row)
-
-print("\nCustomers without orders:")
-for row in customers_without_orders:
-    print(row)
-
-print("\nOrders per customer:")
-for row in orders_per_customer:
-    print(row)
-
-print("\nRevenue by city:")
-for row in revenue_by_city:
-    print(row)
-
-
-# Close database connection
-connection.close()
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.data_loader.profiler import (
+from engineering_workbench.profiler import (
     get_shape,
     get_columns,
     get_missing_values,
