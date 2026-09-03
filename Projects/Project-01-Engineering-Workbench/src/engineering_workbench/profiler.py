@@ -33,6 +33,8 @@ def get_numeric_summary(data: pd.DataFrame) -> dict:
         columns=identifier_columns,
         errors="ignore",
     )
+    if numeric_data.empty:
+        return {}
 
     return numeric_data.describe().to_dict()
 

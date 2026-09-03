@@ -25,6 +25,12 @@ from engineering_workbench.database import (
     get_revenue_by_city,
     write_dataframe_to_table,
 )
+def run_profile(data_path):
+    data = load_csv(data_path)
+
+    profile = profile_data(data)
+
+    return profile
 
 def run_analysis():
     orders = load_csv(

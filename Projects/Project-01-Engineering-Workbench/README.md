@@ -1507,3 +1507,14 @@ The refactored application was verified through:
 - Full test suite inside Docker
 
 The refactoring preserved existing application behavior while establishing a cleaner package and service architecture for Week 3.
+
+## Day 14 — CLI Data Profiler
+
+The Engineering Workbench now provides an installable command-line interface for profiling CSV datasets and running database analysis.
+
+### CLI Commands
+
+Profile a CSV dataset:
+
+```powershell
+engineering-workbench profile data/raw/orders_week2.csv
