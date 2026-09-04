@@ -1518,3 +1518,147 @@ Profile a CSV dataset:
 
 ```powershell
 engineering-workbench profile data/raw/orders_week2.csv
+
+## Day 15 — FastAPI Fundamentals
+
+The Engineering Workbench now includes a basic FastAPI web interface.
+
+### API Module
+
+```text
+src/engineering_workbench/api.py
+```
+
+The current production API exposes:
+
+```text
+GET /
+GET /health
+```
+
+### Root Endpoint
+
+```text
+GET /
+```
+
+Returns:
+
+```json
+{
+  "message": "Engineering Workbench API"
+}
+```
+
+### Health Endpoint
+
+```text
+GET /health
+```
+
+Returns:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+### Run the API Locally
+
+```powershell
+uvicorn engineering_workbench.api:app --reload
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000/
+http://127.0.0.1:8000/health
+http://127.0.0.1:8000/docs
+```
+
+FastAPI automatically provides interactive Swagger documentation at:
+
+```text
+/docs
+```
+
+### API Testing
+
+API tests are located in:
+
+```text
+tests/test_api.py
+```
+
+Run only the API tests:
+
+```powershell
+python -m pytest tests/test_api.py -v
+```
+
+Run the complete regression suite:
+
+```powershell
+python -m pytest -v
+```
+
+Day 15 verification result:
+
+```text
+41 passed
+```
+
+with one third-party Starlette/AnyIO deprecation warning.
+
+### Docker Verification
+
+Rebuild the image after dependency changes:
+
+```powershell
+docker build -t engineering-workbench .
+```
+
+Run the test suite inside Docker:
+
+```powershell
+docker run --rm engineering-workbench python -m pytest
+```
+
+Run the FastAPI application inside Docker:
+
+```powershell
+docker run --rm -p 8000:8000 engineering-workbench uvicorn engineering_workbench.api:app --host 0.0.0.0 --port 8000
+```
+
+This maps:
+
+```text
+Windows port 8000
+        ↓
+Container port 8000
+        ↓
+Uvicorn
+        ↓
+FastAPI
+```
+
+### Current Week 3 Architecture
+
+```text
+                 ┌───────────┐
+                 │    CLI    │
+                 └─────┬─────┘
+                       │
+                       ▼
+                Service Layer
+
+                 ┌───────────┐
+                 │    API    │
+                 └───────────┘
+```
+
+At the end of Day 15, the FastAPI interface is established and verified independently.
+
+The next step is to connect the API layer to the existing Engineering Workbench service layer so that HTTP endpoints can expose real analytical functionality instead of only basic application and health responses.
