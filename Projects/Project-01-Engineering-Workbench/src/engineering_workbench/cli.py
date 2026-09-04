@@ -1,7 +1,6 @@
 import argparse
 
 from engineering_workbench import (
-    run_analysis,
     run_database_analysis,
     run_profile,
 )
@@ -20,11 +19,9 @@ def handle_profile(args):
 
 
 def handle_database():
-    analysis_results = run_analysis()
 
-    database_results = run_database_analysis(
-        analysis_results["orders"]
-    )
+    database_results = run_database_analysis()
+    
 
     print("\n=== Database Analysis ===")
 

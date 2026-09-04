@@ -1662,3 +1662,124 @@ FastAPI
 At the end of Day 15, the FastAPI interface is established and verified independently.
 
 The next step is to connect the API layer to the existing Engineering Workbench service layer so that HTTP endpoints can expose real analytical functionality instead of only basic application and health responses.
+
+## Day 16 — Analytical API Endpoint
+
+Day 16 connected the FastAPI application to the Engineering Workbench service layer, allowing HTTP clients to execute real analytical workflows.
+
+### Analytical API Endpoints
+
+The API now provides:
+
+```text
+GET /profile
+GET /database
+```
+
+Profile a supported dataset:
+
+```text
+GET /profile?dataset=orders
+```
+
+Supported datasets:
+
+```text
+orders
+customers
+```
+
+The dataset parameter uses Python `Literal` typing, allowing FastAPI to automatically validate supported values and expose the available choices through Swagger documentation.
+
+### Database Analysis Endpoint
+
+```text
+GET /database
+```
+
+This endpoint delegates to the existing database-analysis service and returns results including:
+
+- expensive orders
+- payment method counts
+- product quantity totals
+- customer/order details
+- customers without orders
+- orders per customer
+- revenue by city
+
+### Service-Layer Refactor
+
+Shared orders preparation was extracted into:
+
+```python
+load_and_validate_orders()
+```
+
+Both:
+
+```python
+run_analysis()
+run_database_analysis()
+```
+
+can now reuse the same loading and validation workflow without requiring one service operation to execute the other.
+
+The resulting architecture is:
+
+```text
+CLI ─────┐
+         │
+         ├──→ Service Layer
+         │        ↓
+API ─────┘   Application Logic
+                  ↓
+        Loader / Validator / Profiler / Database
+```
+
+This keeps the CLI and API thin while allowing both interfaces to reuse the same underlying application logic.
+
+### API Testing
+
+The FastAPI test suite now covers:
+
+- root endpoint
+- health endpoint
+- orders profiling
+- customers profiling
+- invalid dataset validation
+- database analysis
+
+Example:
+
+```python
+response = client.get(
+    "/profile",
+    params={"dataset": "orders"},
+)
+```
+
+Invalid dataset values are rejected by FastAPI with HTTP `422` because the `dataset` parameter is restricted to the supported values.
+
+### Verification
+
+Day 16 was verified through:
+
+```text
+Swagger/manual API testing
+API TestClient tests
+full regression testing
+Docker regression testing
+```
+
+The full regression suite also detected an outdated service test after the `run_database_analysis()` interface was refactored. Updating that test confirmed that the new service contract remained compatible with the rest of the application.
+
+### Current API
+
+```text
+GET /            → API identification
+GET /health      → health check
+GET /profile     → dataset profiling
+GET /database    → database analysis
+```
+
+Statistics and outlier analysis remain available through the internal `run_analysis()` service workflow but were not exposed as a dedicated API endpoint during Day 16.

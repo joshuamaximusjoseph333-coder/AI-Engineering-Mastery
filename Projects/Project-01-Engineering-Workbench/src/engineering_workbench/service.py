@@ -1,13 +1,3 @@
-from engineering_workbench.loader import load_csv
-from engineering_workbench.profiler import profile_data
-from engineering_workbench.statistics import (
-    get_descriptive_statistics,
-    get_outliers,
-)
-from engineering_workbench.validator import (
-    validate_order_values,
-    validate_required_columns,
-)
 from engineering_workbench.config import (
     CUSTOMERS_DATA_PATH,
     DATABASE_PATH,
@@ -25,6 +15,18 @@ from engineering_workbench.database import (
     get_revenue_by_city,
     write_dataframe_to_table,
 )
+from engineering_workbench.loader import load_csv
+from engineering_workbench.profiler import profile_data
+from engineering_workbench.statistics import (
+    get_descriptive_statistics,
+    get_outliers,
+)
+from engineering_workbench.validator import (
+    validate_order_values,
+    validate_required_columns,
+)
+
+
 def run_profile(data_path):
     data = load_csv(data_path)
 
@@ -32,7 +34,7 @@ def run_profile(data_path):
 
     return profile
 
-def run_analysis():
+def load_and_validate_orders():
     orders = load_csv(
         ORDERS_DATA_PATH,
         parse_dates=["order_date"],
@@ -40,6 +42,11 @@ def run_analysis():
 
     validate_required_columns(orders)
     validate_order_values(orders)
+
+    return orders
+
+def run_analysis():
+    orders = load_and_validate_orders()
 
     profile = profile_data(orders)
 
@@ -60,7 +67,9 @@ def run_analysis():
         "price_outliers": price_outliers,
     }
 
-def run_database_analysis(orders):
+def run_database_analysis():
+    orders = load_and_validate_orders()
+
     customers = load_csv(CUSTOMERS_DATA_PATH)
 
     connection = create_connection(DATABASE_PATH)

@@ -13,11 +13,7 @@ def test_run_analysis_returns_expected_sections():
     assert "price_outliers" in results
 
 def test_run_database_analysis_returns_expected_sections():
-    analysis_results = run_analysis()
-
-    results = run_database_analysis(
-        analysis_results["orders"]
-    )
+    results = run_database_analysis()
 
     assert "expensive_orders" in results
     assert "payment_counts" in results
