@@ -15,9 +15,7 @@ def main():
     price_outliers = analysis_results["price_outliers"]
 
     # Run database analysis
-    database_results = run_database_analysis(
-        analysis_results["orders"]
-    )
+    database_results = run_database_analysis()
 
     expensive_orders = database_results["expensive_orders"]
     payment_counts = database_results["payment_counts"]
