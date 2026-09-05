@@ -1,6 +1,7 @@
 import argparse
 
 from engineering_workbench import (
+    run_analysis,
     run_database_analysis,
     run_profile,
 )
@@ -18,10 +19,19 @@ def handle_profile(args):
             print(f"{key}: {value}")
 
 
-def handle_database():
+def handle_analysis():
+    results = run_analysis()
 
+    print("\n=== Price Statistics ===")
+    for key, value in results["price_statistics"].items():
+        print(f"{key}: {value}")
+
+    print("\n=== Price Outliers ===")
+    print(results["price_outliers"])
+
+
+def handle_database():
     database_results = run_database_analysis()
-    
 
     print("\n=== Database Analysis ===")
 
@@ -49,9 +59,9 @@ def main(argv=None):
     )
 
     profile_parser.add_argument(
-    "path",
-    help="Path to the CSV file to profile.",
-)
+        "path",
+        help="Path to the CSV file to profile.",
+    )
 
     profile_parser.add_argument(
         "--section",
@@ -70,15 +80,24 @@ def main(argv=None):
     )
 
     subparsers.add_parser(
+        "analysis",
+        help="Run statistical analysis on the orders dataset.",
+    )
+
+    subparsers.add_parser(
         "database",
         help="Run database analysis.",
     )
 
     args = parser.parse_args(argv)
+
     if args.command == "profile":
         handle_profile(args)
 
-    if args.command == "database":
+    elif args.command == "analysis":
+        handle_analysis()
+
+    elif args.command == "database":
         handle_database()
 
 

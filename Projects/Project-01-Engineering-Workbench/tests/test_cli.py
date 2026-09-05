@@ -37,3 +37,15 @@ def test_invalid_profile_section():
             "--section",
             "banana",
         ])
+
+def test_analysis_command(capsys):
+    main(["analysis"])
+
+    captured = capsys.readouterr()
+
+    assert "=== Price Statistics ===" in captured.out
+    assert "mean:" in captured.out
+    assert "median:" in captured.out
+    assert "skewness:" in captured.out
+    assert "skewness_direction:" in captured.out
+    assert "=== Price Outliers ===" in captured.out        

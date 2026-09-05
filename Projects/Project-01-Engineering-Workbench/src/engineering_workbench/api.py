@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from engineering_workbench import (
     run_database_analysis,
     run_profile,
+    run_analysis
 )
 
 app = FastAPI()
@@ -38,6 +39,15 @@ def profile(dataset: Literal["orders", "customers"]):
             status_code=404,
             detail=f"Dataset '{dataset}' file not found",
         )
+@app.get("/analysis")
+def analysis():
+    results = run_analysis()
+
+    return {
+        "profile": results["profile"],
+        "price_statistics": results["price_statistics"],
+        "price_outliers": results["price_outliers"],
+    }
 
 @app.get("/database")
 def database_analysis():

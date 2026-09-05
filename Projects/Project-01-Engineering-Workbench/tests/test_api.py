@@ -105,4 +105,23 @@ def test_profile_returns_404_when_dataset_file_is_missing(monkeypatch):
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Dataset 'orders' file not found",
-    }    
+    }
+
+def test_analysis():
+    response = client.get("/analysis")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "profile" in data
+    assert "price_statistics" in data
+    assert "price_outliers" in data
+
+    statistics = data["price_statistics"]
+
+    assert "mean" in statistics
+    assert "median" in statistics
+    assert "standard_deviation" in statistics
+    assert "skewness" in statistics
+    assert "skewness_direction" in statistics    
