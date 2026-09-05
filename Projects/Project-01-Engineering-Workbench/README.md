@@ -1783,3 +1783,129 @@ GET /database    → database analysis
 ```
 
 Statistics and outlier analysis remain available through the internal `run_analysis()` service workflow but were not exposed as a dedicated API endpoint during Day 16.
+
+## Day 17 — Integration + Failure Testing
+
+Day 17 focused on verifying how the Engineering Workbench behaves when realistic failures occur across the service, database and API layers.
+
+### Failure Scenarios Covered
+
+The project now includes tests for:
+
+- invalid order data reaching the analysis workflow
+- missing order files
+- database-operation failure
+- database connection cleanup during failure
+- unexpected internal API failures
+- controlled API translation of missing dataset files
+
+### Integration Testing
+
+Service-level tests verify that components are connected correctly.
+
+For example:
+
+```text
+run_analysis()
+      ↓
+load_and_validate_orders()
+      ↓
+load_csv()
+      ↓
+validation
+```
+
+A representative invalid-order test confirms that the service actually invokes validation before continuing with analysis.
+
+### Failure Simulation with `monkeypatch`
+
+Pytest's `monkeypatch` fixture is used to temporarily replace dependencies during tests.
+
+This allows failures to be simulated without modifying real project files or databases.
+
+Examples include:
+
+```text
+load_csv() → invalid DataFrame
+load_csv() → FileNotFoundError
+database write → RuntimeError
+API service call → RuntimeError
+```
+
+The original dependencies are restored automatically after each test.
+
+### Database Cleanup
+
+The database service already uses:
+
+```python
+try:
+    ...
+finally:
+    connection.close()
+```
+
+A failure test now verifies that the connection is still closed even when a database operation raises an exception.
+
+This confirms that resource cleanup occurs on unsuccessful paths as well as successful ones.
+
+### API Failure Behaviour
+
+The API now demonstrates several different failure categories:
+
+```text
+Invalid dataset value
+→ 422 Unprocessable Content
+
+Configured profile file missing
+→ 404 Not Found
+
+Unexpected internal server failure
+→ 500 Internal Server Error
+```
+
+A known `FileNotFoundError` from the profile workflow is translated at the API boundary into a controlled `404` response:
+
+```json
+{
+    "detail": "Dataset 'orders' file not found"
+}
+```
+
+The service layer remains independent of HTTP and continues to use normal Python exceptions.
+
+### TestClient Server Errors
+
+API failure tests use:
+
+```python
+TestClient(
+    app,
+    raise_server_exceptions=False,
+)
+```
+
+when the goal is to inspect the actual HTTP `500` response instead of having the original Python exception re-raised into the test.
+
+### Verification
+
+Day 17 was verified through:
+
+```text
+focused failure tests
+full local regression testing
+Docker regression testing
+Dockerized API verification
+```
+
+The emphasis was on meaningful failure behaviour rather than adding repetitive tests for every possible invalid value.
+
+### Day 17 Result
+
+The Engineering Workbench now has evidence that it behaves predictably when:
+
+- input data is invalid
+- required files are unavailable
+- database operations fail
+- resources require cleanup after failure
+- API-facing failures need to be classified and communicated

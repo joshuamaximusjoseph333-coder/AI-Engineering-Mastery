@@ -1,6 +1,6 @@
 from typing import Literal
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from engineering_workbench import (
     run_database_analysis,
@@ -31,7 +31,13 @@ def health():
 def profile(dataset: Literal["orders", "customers"]):
     data_path = DATASETS[dataset]
 
-    return run_profile(data_path)
+    try:
+        return run_profile(data_path)
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Dataset '{dataset}' file not found",
+        )
 
 @app.get("/database")
 def database_analysis():

@@ -71,3 +71,38 @@ def test_database_analysis():
     assert "payment_counts" in data
     assert "product_totals" in data
     assert "revenue_by_city" in data    
+
+def test_database_analysis_returns_500_on_internal_failure(monkeypatch):
+    def fail_database_analysis():
+        raise RuntimeError("database failed")
+
+    monkeypatch.setattr(
+        "engineering_workbench.api.run_database_analysis",
+        fail_database_analysis,
+    )
+
+    client = TestClient(
+    app,
+    raise_server_exceptions=False,
+    )
+    response = client.get("/database")
+    assert response.status_code == 500
+
+def test_profile_returns_404_when_dataset_file_is_missing(monkeypatch):
+    def fail_profile(*args, **kwargs):
+        raise FileNotFoundError("file missing")
+
+    monkeypatch.setattr(
+        "engineering_workbench.api.run_profile",
+        fail_profile,
+    )
+
+    response = client.get(
+        "/profile",
+        params={"dataset": "orders"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Dataset 'orders' file not found",
+    }    
